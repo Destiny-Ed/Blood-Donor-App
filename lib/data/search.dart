@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class Search extends StatefulWidget {
   //Create a constructor to get the return Search results
@@ -9,9 +10,10 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
+  TextEditingController _messageController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    print("Search Results ${widget.searchResult}");
+    print("Search Results ddddddddddddddd ${widget.searchResult}");
 
     return Scaffold(
       appBar: AppBar(
@@ -61,11 +63,59 @@ class _SearchState extends State<Search> {
                     children: [Text(bloodGroup), Text(rhesus)],
                   ),
                 ),
+                onTap: () {
+                  /**Show Email dialog here */
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Compose a message"),
+                          content: TextFormField(
+                            controller: _messageController,
+                            maxLines: 6,
+                            decoration: InputDecoration(
+                                labelText: "Enter a messsage..."),
+                          ),
+                          actions: [
+                            GestureDetector(
+                              onTap: () {
+                                //Send Email
+                                //Invoke the SendEmailMessage Method which handles sending of
+                                //email to displayed email address
+                                sendEmailMessage(
+                                    messageBody: _messageController.text.trim(),
+                                    emailTo: email.toString().toLowerCase());
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(15),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                ),
+                                child: Text("Send"),
+                              ),
+                            )
+                          ],
+                        );
+                      });
+                },
               ),
             );
           }),
         ),
       ),
     );
+  }
+
+  //Function for sending email to the displayed email address donor
+  Future<String> sendEmailMessage({String messageBody, String emailTo}) async {
+    final Email email = Email(
+      body: messageBody,
+      /**Message Body */
+      subject: 'Blood Donor',
+      /**Message Title */
+      recipients: [emailTo], /**The person you are sending to */
+    );
+
+    await FlutterEmailSender.send(email);
   }
 }
